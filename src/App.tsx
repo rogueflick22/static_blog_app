@@ -2,9 +2,10 @@ import { useState } from "react";
 import { posts } from "./data/posts";
 import type { Post } from "./data/posts";
 import type { Comment } from "./types";
-import "./App.css";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import PostList from "./components/PostList";
+import "./App.css";
 
 function App() {
   // App owns the state
@@ -36,11 +37,11 @@ function App() {
       <Navbar />
       <Hero />
 
-      {posts.map((p) => (
-        <button key={p.id} onClick={() => setSelectedPost(p)}>
-          {p.title}
-        </button>
-      ))}
+      <PostList
+        posts={posts}
+        selectedId={selectedPost.id}
+        onSelect={setSelectedPost}
+      />
 
       <h2>Selected: {selectedPost.title}</h2>
       <p>Comments on this post: {postComments.length}</p>
