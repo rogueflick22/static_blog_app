@@ -3,6 +3,8 @@ import { posts } from "./data/posts";
 import type { Post } from "./data/posts";
 import type { Comment } from "./types";
 import "./App.css";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
 
 function App() {
   // App owns the state
@@ -31,7 +33,8 @@ function App() {
 
   return (
     <div>
-      <h1>MyBlog (temporary test)</h1>
+      <Navbar />
+      <Hero />
 
       {posts.map((p) => (
         <button key={p.id} onClick={() => setSelectedPost(p)}>
