@@ -5,6 +5,7 @@ import type { Comment } from "./types";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import PostList from "./components/PostList";
+import PostDetail from "./components/PostDetail";
 import "./App.css";
 
 function App() {
@@ -43,7 +44,8 @@ function App() {
         onSelect={setSelectedPost}
       />
 
-      <h2>Selected: {selectedPost.title}</h2>
+      <PostDetail post={selectedPost} />
+
       <p>Comments on this post: {postComments.length}</p>
       <p>Last commenter: {lastCommenter}</p>
 
