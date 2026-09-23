@@ -34,24 +34,41 @@ function App() {
   const postComments = comments[selectedPost.id] || [];
 
   return (
-    <div>
+    <div className="app">
       <Navbar />
-      <Hero />
 
-      <PostList
-        posts={posts}
-        selectedId={selectedPost.id}
-        onSelect={setSelectedPost}
-      />
+      <main className="container">
+        <Hero />
 
-      <PostDetail post={selectedPost} />
+        <div className="layout">
+          {/* Left column */}
+          <PostList
+            posts={posts}
+            selectedId={selectedPost.id}
+            onSelect={setSelectedPost}
+          />
 
-      <p>Comments on this post: {postComments.length}</p>
-      <p>Last commenter: {lastCommenter}</p>
+          {/* Right column (sidebar) */}
+          <aside className="sidebar">
+            <PostDetail post={selectedPost} />
 
-      <button onClick={() => addComment("Test", "This is a test comment")}>
-        Add test comment
-      </button>
+            <div className="widget">
+              <h3>Comments</h3>
+              {/* GROUPMATE: CommentList + CommentForm go here */}
+              <p>Comments on this post: {postComments.length}</p>
+              <p>Last commenter: {lastCommenter}</p>
+              <button onClick={() => addComment("Test", "This is a test comment")}>
+                Add test comment
+              </button>
+            </div>
+
+            <div className="widget">
+              <h3>Categories</h3>
+              {/* GROUPMATE: CategoryList goes here */}
+            </div>
+          </aside>
+        </div>
+      </main>
     </div>
   );
 }

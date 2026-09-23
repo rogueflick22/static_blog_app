@@ -13,7 +13,7 @@ export default function PostDetail({ post }: Props) {
         {post.date} • {post.category}
       </p>
       <img src={post.imageUrl} alt={post.title} />
-      <p className="post-content">{post.content}</p>
+      <p className="post-content">{post.content.trim()}</p>
     </section>
   );
 }
