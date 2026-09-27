@@ -206,6 +206,100 @@ button:hover {
   font-size: 0.95rem;
 }
 
+/* ===== Comments ===== */
+
+.comment-list {
+  margin-bottom: 16px;
+}
+
+.comment-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.comment-name {
+  font-size: 0.9rem;
+}
+
+.comment-date {
+  color: var(--muted);
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.no-comments {
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.last-commenter {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+
+/* ===== Comment Form ===== */
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-form h3 {
+  margin-top: 8px;
+}
+
+.comment-form input,
+.comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font);
+}
+
+.comment-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+  outline: 2px solid var(--primary);
+  border-color: var(--primary);
+}
+
+.comment-form button {
+  align-self: flex-start;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+
+/* ===== Categories ===== */
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-list p {
+  cursor: pointer;
+}
+
+.category-list p:hover {
+  color: var(--primary);
+}
+
 /* ===== Responsive: tablet ===== */
 @media (max-width: 900px) {
   .layout {
