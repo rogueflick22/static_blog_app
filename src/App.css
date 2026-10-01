@@ -284,20 +284,34 @@ button:hover {
 }
 
 
+
 /* ===== Categories ===== */
 
 .category-list {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
 }
 
-.category-list p {
+.category-list button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #0f172a;
+  font-size: 16px;
+  font-family: var(--font);
   cursor: pointer;
+  text-align: left;
 }
 
-.category-list p:hover {
+.category-list button:hover {
   color: var(--primary);
+}
+
+.category-list .category-active {
+  color: var(--primary);
+  font-weight: 600;
 }
 
 /* ===== Responsive: tablet ===== */
