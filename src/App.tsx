@@ -12,30 +12,79 @@ import CategoryList from "./components/CategoryList";
 
 import "./App.css";
 
+// Type for comments coming from DummyJSON
+type ApiComment = {
+  id: number;
+  body: string;
+  postId: number;
+  likes: number;
+  user: {
+    id: number;
+    username: string;
+    fullName: string;
+  };
+};
+
+type CommentsResponse = {
+  comments: ApiComment[];
+  total: number;
+  skip: number;
+  limit: number;
+};
+
 function App() {
-  // Posts now come from the API
+  // =========================
+  // POSTS STATE
+  // =========================
+
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  // Loading + error states
+  // Loading + error states for posts
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // =========================
+  // COMMENTS STATE
+  // =========================
+
+  // Comments coming from API
   const [comments, setComments] = useState<Record<number, Comment[]>>({});
+
+  // Comments added by the user
+  const [userComments, setUserComments] = useState<
+    Record<number, Comment[]>
+  >({});
+
   const [lastCommenter, setLastCommenter] = useState("");
 
-  // Runs ONCE when the app loads (because of [])
+  // =========================
+  // CATEGORY STATE
+  // =========================
+
+  const [selectedTag, setSelectedTag] = useState("All");
+
+  // =========================
+  // FETCH POSTS
+  // =========================
+
+  // Runs ONCE when the application loads because of []
   useEffect(() => {
     fetch("https://dummyjson.com/posts?limit=10")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Request failed");
         }
+
         return response.json();
       })
       .then((data: PostsResponse) => {
         setPosts(data.posts);
-        setSelectedPost(data.posts[0]); // first post selected by default
+
+        // Select first post automatically
+        if (data.posts.length > 0) {
+          setSelectedPost(data.posts[0]);
+        }
       })
       .catch(() => {
         setError("Unable to load blog posts. Please try again later.");
@@ -45,28 +94,117 @@ function App() {
       });
   }, []);
 
-  const addComment = (name: string, text: string) => {
-    if (!selectedPost) return;
+  // =========================
+  // FETCH COMMENTS
+  // =========================
+
+  // Runs whenever selectedPost changes
+  useEffect(() => {
+    if (!selectedPost) {
+      return;
+    }
+
+    fetch(
+      `https://dummyjson.com/posts/${selectedPost.id}/comments`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unable to load comments");
+        }
+
+        return response.json();
+      })
+      .then((data: CommentsResponse) => {
+        // Convert API comments to our Comment type
+        const apiComments: Comment[] = data.comments.map(
+          (comment) => ({
+            id: comment.id,
+            name: comment.user.fullName,
+
+            // DummyJSON comments do not provide email
+            email: "",
+
+            text: comment.body,
+            date: "API Comment",
+          })
+        );
+
+        // Save comments for the selected post
+        setComments((prev) => ({
+          ...prev,
+          [selectedPost.id]: apiComments,
+        }));
+      })
+      .catch((error) => {
+        console.log("Unable to load comments:", error);
+      });
+  }, [selectedPost]);
+
+  // =========================
+  // ADD NEW COMMENT
+  // =========================
+
+  const addComment = (
+    name: string,
+    email: string,
+    text: string
+  ) => {
+    if (!selectedPost) {
+      return;
+    }
 
     const newComment: Comment = {
       id: Date.now(),
       name,
+      email,
       text,
       date: new Date().toLocaleString(),
     };
 
-    setComments((prev) => ({
+    // Store user-created comments separately
+    setUserComments((prev) => ({
       ...prev,
-      [selectedPost.id]: [...(prev[selectedPost.id] || []), newComment],
+
+      [selectedPost.id]: [
+        ...(prev[selectedPost.id] || []),
+        newComment,
+      ],
     }));
 
     setLastCommenter(name);
   };
 
-  const postComments = selectedPost ? comments[selectedPost.id] || [] : [];
+  // =========================
+  // COMBINE COMMENTS
+  // =========================
 
-  // Categories now come from the API tags (Parwinder will improve this)
-  const categories = [...new Set(posts.flatMap((post) => post.tags))];
+  // API comments + comments added by user
+  const postComments = selectedPost
+    ? [
+        ...(comments[selectedPost.id] || []),
+        ...(userComments[selectedPost.id] || []),
+      ]
+    : [];
+
+  // =========================
+  // CATEGORIES
+  // =========================
+
+  // Get all unique tags from API posts
+  const categories = [
+    ...new Set(posts.flatMap((post) => post.tags)),
+  ];
+
+  // =========================
+  // FILTER POSTS
+  // =========================
+
+  const filteredPosts =
+    selectedTag === "All"
+      ? posts
+      : posts.filter((post) =>
+          post.tags.includes(selectedTag)
+        );
 
   return (
     <div className="app">
@@ -76,25 +214,44 @@ function App() {
         <Hero />
 
         <div className="layout">
-          {/* Left column: loading, error, or posts */}
-          <section>
-            {loading && <p className="status">Loading posts...</p>}
+          {/* =========================
+              LEFT COLUMN
+          ========================= */}
 
-            {error && <p className="status error">{error}</p>}
+          <section>
+            {loading && (
+              <p className="status">
+                Loading posts...
+              </p>
+            )}
+
+            {error && (
+              <p className="status error">
+                {error}
+              </p>
+            )}
 
             {!loading && !error && (
               <PostList
-                posts={posts}
+                posts={filteredPosts}
                 selectedId={selectedPost?.id ?? 0}
                 onSelect={setSelectedPost}
               />
             )}
           </section>
 
-          {/* Right column (sidebar) */}
-          <aside className="sidebar">
-            {selectedPost && <PostDetail post={selectedPost} />}
+          {/* =========================
+              RIGHT COLUMN
+          ========================= */}
 
+          <aside className="sidebar">
+
+            {/* Selected post */}
+            {selectedPost && (
+              <PostDetail post={selectedPost} />
+            )}
+
+            {/* Comments */}
             <div className="widget">
               <h3>Comments</h3>
 
@@ -106,13 +263,22 @@ function App() {
                 </p>
               )}
 
-              <CommentForm onAddComment={addComment} />
+              <CommentForm
+                onAddComment={addComment}
+              />
             </div>
 
+            {/* Categories */}
             <div className="widget">
               <h3>Categories</h3>
-              <CategoryList categories={categories} />
+
+              <CategoryList
+                categories={categories}
+                selectedTag={selectedTag}
+                onSelectTag={setSelectedTag}
+              />
             </div>
+
           </aside>
         </div>
       </main>
