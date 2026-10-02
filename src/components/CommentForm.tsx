@@ -1,64 +1,91 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+type FormData = {
+  name: string;
+  email: string;
+  comment: string;
+};
 
 type Props = {
-  onAddComment: (name: string, text: string) => void;
+  onAddComment: (
+    name: string,
+    email: string,
+    text: string
+  ) => void;
 };
 
 export default function CommentForm({ onAddComment }: Props) {
-  const [name, setName] = useState("");
-  const [comment, setComment] = useState("");
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>();
 
-  const [nameError, setNameError] = useState("");
-  const [commentError, setCommentError] = useState("");
+  const onSubmit = (data: FormData) => {
+    onAddComment(
+      data.name.trim(),
+      data.email.trim(),
+      data.comment.trim()
+    );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    let isValid = true;
-
-    setNameError("");
-    setCommentError("");
-
-    if (name.trim().length < 2) {
-      setNameError("Name must be at least 2 characters.");
-      isValid = false;
-    }
-
-    if (comment.trim().length < 10) {
-      setCommentError("Comment must be at least 10 characters.");
-      isValid = false;
-    }
-
-    if (!isValid) {
-      return;
-    }
-
-    onAddComment(name.trim(), comment.trim());
-
-    setName("");
-    setComment("");
+    reset();
   };
 
   return (
-    <form className="comment-form" onSubmit={handleSubmit}>
+    <form className="comment-form" onSubmit={handleSubmit(onSubmit)}>
       <h3>Add a Comment</h3>
 
       <input
         type="text"
         placeholder="Your name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        {...register("name", {
+          required: "Name is required.",
+          minLength: {
+            value: 2,
+            message: "Name must be at least 2 characters.",
+          },
+        })}
       />
 
-      {nameError && <p className="error">{nameError}</p>}
+      {errors.name && (
+        <p className="error">{errors.name.message}</p>
+      )}
+
+      <input
+        type="email"
+        placeholder="Your email"
+        {...register("email", {
+          required: "Email is required.",
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: "Please enter a valid email address.",
+          },
+        })}
+      />
+
+      {errors.email && (
+        <p className="error">{errors.email.message}</p>
+      )}
 
       <textarea
         placeholder="Write a comment"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        {...register("comment", {
+          required: "Comment is required.",
+          minLength: {
+            value: 10,
+            message: "Comment must be at least 10 characters.",
+          },
+          maxLength: {
+            value: 200,
+            message: "Comment cannot be more than 200 characters.",
+          },
+        })}
       />
 
-      {commentError && <p className="error">{commentError}</p>}
+      {errors.comment && (
+        <p className="error">{errors.comment.message}</p>
+      )}
 
       <button type="submit">Post Comment</button>
     </form>
