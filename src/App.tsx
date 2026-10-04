@@ -236,6 +236,7 @@ function App() {
                 posts={filteredPosts}
                 selectedId={selectedPost?.id ?? 0}
                 onSelect={setSelectedPost}
+                selectedTag={selectedTag}
               />
             )}
           </section>
