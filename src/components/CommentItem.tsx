@@ -5,15 +5,29 @@ type Props = {
 };
 
 export default function CommentItem({ comment }: Props) {
+  const isApiComment = comment.date === "API Comment";
+
   return (
     <div className="comment-item">
-      <p className="comment-name">
-        <strong>{comment.name}</strong>
+      <div className="comment-header">
+        <strong className="comment-name">
+          {comment.name}
+        </strong>
+
+        {isApiComment ? (
+          <span className="api-comment-label">
+            API Comment
+          </span>
+        ) : (
+          <span className="comment-date">
+            {comment.date}
+          </span>
+        )}
+      </div>
+
+      <p className="comment-text">
+        {comment.text}
       </p>
-
-      <p className="comment-date">{comment.date}</p>
-
-      <p>{comment.text}</p>
     </div>
   );
 }

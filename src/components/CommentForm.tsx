@@ -33,7 +33,7 @@ export default function CommentForm({ onAddComment }: Props) {
   };
 
   return (
-    <form className="comment-form" onSubmit={handleSubmit(onSubmit)}>
+    <form className="comment-form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <h3>Add a Comment</h3>
 
       <input
